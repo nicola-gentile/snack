@@ -1,17 +1,35 @@
 package org.snack.compiler.lexer;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.Map;
 import java.util.Set;
 
-public record SyntaxElement(@NonNull String value) implements Token {
+@AllArgsConstructor
+public enum SyntaxElement implements Token {
 
-    @Getter(lazy=true)
-    final static private Set<String> syntaxELements = Set.of(
-            "if", "do", "else", "end", "match", "case", "def", "defp", "import",
-            "(", ")", "[", "]", "{", "}", ",", "|", ".", "..", "&"
-    );
+    IF("if"),
+    ELSE("else"),
+    END("end"),
+    MATCH("match"),
+    CASE("case"),
+    DEF("def"),
+    DEFP("defp"),
+    IMPORT("import"),
+    OPEN_ROUND_BRACKET("("),
+    CLOSE_ROUND_BRACKET(")"),
+    OPEN_SQUARE_BRACKET("["),
+    CLOSE_SQUARE_BRACKET("]"),
+    COMMA(","),
+    PIPE("|"),
+    DOUBLEDOT(".."),
+    DOT("."),
+    AMPERSAND("&");
+
+    @Getter
+    @NonNull
+    final String text;
 
 }
