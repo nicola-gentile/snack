@@ -13,42 +13,46 @@ public record Identifier(String id) implements Token {
     public final static String DIRTY_FUNCTION_REGEX = "[A-Za-z_][A-Za-z0-9'?]*!";
     public final static String MODULE_REGEX = "[a-z]([a-z_]*[a-z])?";
     public final static String MACRO_REGEX = "\\$[A-Za-z_0-9]+";
+    public final static String SELF_FIELD_REGEX = "@[A-Za-z_][A-Za-z0-9'?!]*";
 
-    public boolean isValidVariableName() {
+    public boolean isVariableName() {
         return id.matches(VARIABLE_REGEX);
     }
 
-    public boolean isValidModuleName() {
+    public boolean isModuleName() {
         return id.matches(MODULE_REGEX);
     }
 
-    public boolean isValidDataName() {
+    public boolean isDataName() {
         return id.matches(DATA_REGEX);
     }
 
-    public boolean isValidTraitName() {
+    public boolean isTraitName() {
         return id.matches(TRAIT_REGEX);
     }
 
-    public boolean isValidFunctionName() {
-        return isValidPureFunctionName() || isValidDirtyFunctionName() || isValidSymbolFunctionName();
+    public boolean isFunctionName() {
+        return isPureFunctionName() || isDirtyFunctionName() || isSymbolFunctionName();
     }
 
-    public boolean isValidPureFunctionName() {
+    public boolean isPureFunctionName() {
         return id.matches(PURE_FUNCTION_REGEX);
     }
 
-    public boolean isValidDirtyFunctionName() {
+    public boolean isDirtyFunctionName() {
         return id.matches(DIRTY_FUNCTION_REGEX);
     }
 
-    public boolean isValidSymbolFunctionName() {
+    public boolean isSymbolFunctionName() {
         return id.matches(SYMBOL_FUNCTION_REGEX);
     }
 
-    public boolean isValidMacroName() {
+    public boolean isMacroName() {
         return id.matches(MACRO_REGEX);
     }
 
+    public boolean isSelfFieldName() {
+        return id.matches(SELF_FIELD_REGEX);
+    }
 
 }
