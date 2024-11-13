@@ -3,9 +3,12 @@ package org.snack.compiler.lexer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.util.regex.Pattern;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum SyntaxElement implements Token {
 
     IF("if"),
@@ -16,6 +19,7 @@ public enum SyntaxElement implements Token {
     DEF("def"),
     DEFP("defp"),
     IMPORT("import"),
+    DO("do"),
     OPEN_ROUND_BRACKET("\\("),
     CLOSE_ROUND_BRACKET("\\)"),
     OPEN_SQUARE_BRACKET("\\["),
@@ -24,9 +28,13 @@ public enum SyntaxElement implements Token {
     CLOSE_CURLY_BRACKET("\\}"),
     COMMA(","),
     PIPE("\\|"),
-    DOUBLEDOT("\\.\\."),
+    DOUBLE_DOT("\\.\\."),
     DOT("\\."),
-    AMPERSAND("&");
+    AMPERSAND("&"),
+    COLON(":");
     @NonNull final String regex;
+
+    @Getter(lazy = true)
+    final private Pattern pattern = Pattern.compile(String.format("^(?:%s)", getRegex()));
 
 }
