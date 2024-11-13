@@ -25,7 +25,7 @@ public class LexerTest {
                 "0X56789ABCDEF", "5942249508335"
         );
         for(val key : integersCode.keySet()) {
-            try(val scanner = new LexerScanner(key)) {
+            try(val scanner = new TokenScanner(key)) {
                 val lexer = new Lexer(scanner);
                 val actual = lexer.scanIntegerNumber();
                 val expected = Optional.of(new IntegerNumber(new BigInteger(integersCode.get(key))));
@@ -54,7 +54,7 @@ public class LexerTest {
                 ".4E-4", "56.e-345", "89E7"
         );
         for(val s : floatsCode) {
-            try(val scanner = new LexerScanner(s)) {
+            try(val scanner = new TokenScanner(s)) {
                 val lexer = new Lexer(scanner);
                 val actual = lexer.scanRealNumber();
                 val expected = Optional.of(new RealNumber(new BigDecimal(s)));
@@ -70,7 +70,7 @@ public class LexerTest {
                 "derivate'", "f123?'", "conatins?", "magic_var'?!"
         );
         for(val s : identifiers) {
-            try(val scanner = new LexerScanner(s)) {
+            try(val scanner = new TokenScanner(s)) {
                 val lexer = new Lexer(scanner);
                 val actual = lexer.scanIdentifier();
                 val expected = Optional.of(new Identifier(s));
@@ -81,7 +81,8 @@ public class LexerTest {
 
     @Test
     public void scanInvalidTokenTest() throws Exception {
-        val invalidTokens = List.of(
+        val invalidTokens = Map.of(
+                /*
                 "123abc456", "-45.4E7j'?",
                 "-12.3e-3hgf",
                 "123abc", "12a34",
@@ -93,12 +94,16 @@ public class LexerTest {
                 "0b2", "0B3", "0b4", "0B5", "0b6", "0B7", "0b8", "0B9",
                 "0o8", "0O9",
                 "0xfg2w"
+                */
+                "\"abaco", LexerErrorCode.INVALID_STRING_TOKEN,
+                "'a", LexerErrorCode.INVALID_CHARACTER_TOKEN,
+                "'\\p", LexerErrorCode.INVALID_CHARACTER_TOKEN
         );
-        for(val s : invalidTokens) {
-            try(val scanner = new LexerScanner(s)) {
+        for(val p : invalidTokens.entrySet()) {
+            try(val scanner = new TokenScanner(p.getKey())) {
                 val lexer = new Lexer(scanner);
                 val actual = lexer.scanInvalidToken();
-                val expected = Optional.of(new InvalidToken(s));
+                val expected = Optional.of(new InvalidToken(p.getKey(), p.getValue()));
                 Assert.assertEquals(expected, actual);
             }
         }
@@ -114,7 +119,7 @@ public class LexerTest {
             "#{firstline}\nsecondline}#", "firstline}\nsecondline"
         );
         for(val s : comments.keySet()) {
-            try(val scanner = new LexerScanner(s)) {
+            try(val scanner = new TokenScanner(s)) {
                 val lexer = new Lexer(scanner);
                 val expected = Optional.of(new Comment(comments.get(s)));
                 val actual = lexer.scanComment();
@@ -125,7 +130,7 @@ public class LexerTest {
 
     @Test
     public void scanNewLineTest() throws Exception {
-        try(val lexerScanner = new LexerScanner("\n")) {
+        try(val lexerScanner = new TokenScanner("\n")) {
             Assert.assertEquals(Optional.of(new NewLine()), new Lexer(lexerScanner).scanNewLine());
         }
     }
@@ -145,7 +150,7 @@ public class LexerTest {
                 "'\\u42'", 'B'
         );
         for(val p : chars.entrySet()) {
-            try(val scanner = new LexerScanner(p.getKey())) {
+            try(val scanner = new TokenScanner(p.getKey())) {
                 val lexer = new Lexer(scanner);
                 val expected = Optional.of(new Char(p.getValue()));
                 val actual = lexer.scanChar();
@@ -162,7 +167,7 @@ public class LexerTest {
                 "\"this is an escape character \\\" which is a double quote\"", "this is an escape character \\\" which is a double quote"
         );
         for(val p : strings.entrySet()) {
-            try(val scanner = new LexerScanner(p.getKey())) {
+            try(val scanner = new TokenScanner(p.getKey())) {
                 val lexer = new Lexer(scanner);
                 val expected = Optional.of(new Str(p.getValue()));
                 val actual = lexer.scanStr();
