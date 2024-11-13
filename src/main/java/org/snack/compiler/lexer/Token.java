@@ -5,6 +5,10 @@ public sealed interface Token permits
         RealNumber,
         Identifier,
         SyntaxElement,
-        InvalidToken
+        Char,
+        Str,
+        InvalidToken,
+        Comment,
+        NewLine
 {
 }
