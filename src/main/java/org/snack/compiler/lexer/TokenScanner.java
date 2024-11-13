@@ -6,22 +6,14 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class LexerScanner implements AutoCloseable, RegexScanner {
+public class TokenScanner implements AutoCloseable, RegexScanner {
 
-    private static final String DELIMITER_REGEX = "[\\s\\r\\t]*";
-
-    private void prepareScanner() {
-        this.scanner.useDelimiter(DELIMITER_REGEX);
-    }
-
-    public LexerScanner(@NonNull Readable readable) {
+    public TokenScanner(@NonNull Readable readable) {
         this.scanner = new Scanner(readable);
-        prepareScanner();
     }
 
-    public LexerScanner(@NonNull String source) {
+    public TokenScanner(@NonNull String source) {
         this.scanner = new Scanner(source);
-        prepareScanner();
     }
 
     @NonNull
@@ -34,7 +26,7 @@ public class LexerScanner implements AutoCloseable, RegexScanner {
 
     @Override
     public Optional<String> next(@NonNull Pattern pattern) {
-        return Optional.of(scanner.findInLine(pattern));
+        return Optional.ofNullable(scanner.findWithinHorizon(pattern, 0));
     }
 
 }
