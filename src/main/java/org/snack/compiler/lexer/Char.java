@@ -1,4 +1,4 @@
 package org.snack.compiler.lexer;
 
-public record Char(char c) implements Token {
+public record Char(int code) implements Token {
 }
