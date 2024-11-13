@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.Map;
-import java.util.Set;
-
+@Getter
 @AllArgsConstructor
 public enum SyntaxElement implements Token {
 
@@ -18,18 +16,17 @@ public enum SyntaxElement implements Token {
     DEF("def"),
     DEFP("defp"),
     IMPORT("import"),
-    OPEN_ROUND_BRACKET("("),
-    CLOSE_ROUND_BRACKET(")"),
-    OPEN_SQUARE_BRACKET("["),
-    CLOSE_SQUARE_BRACKET("]"),
+    OPEN_ROUND_BRACKET("\\("),
+    CLOSE_ROUND_BRACKET("\\)"),
+    OPEN_SQUARE_BRACKET("\\["),
+    CLOSE_SQUARE_BRACKET("\\]"),
+    OPEN_CURLY_BRACKET("\\{"),
+    CLOSE_CURLY_BRACKET("\\}"),
     COMMA(","),
-    PIPE("|"),
-    DOUBLEDOT(".."),
-    DOT("."),
+    PIPE("\\|"),
+    DOUBLEDOT("\\.\\."),
+    DOT("\\."),
     AMPERSAND("&");
-
-    @Getter
-    @NonNull
-    final String text;
+    @NonNull final String regex;
 
 }
