@@ -176,4 +176,37 @@ public class LexerTest {
         }
     }
 
+    @Test
+    public void scanSyntaxElement() throws Exception {
+        val syntaxElements = Map.ofEntries(
+                Map.entry("if", SyntaxElement.IF),
+                Map.entry("else", SyntaxElement.ELSE),
+                Map.entry("end", SyntaxElement.END),
+                Map.entry("match", SyntaxElement.MATCH),
+                Map.entry("case", SyntaxElement.CASE),
+                Map.entry("def", SyntaxElement.DEF),
+                Map.entry("defp", SyntaxElement.DEFP),
+                Map.entry("import", SyntaxElement.IMPORT),
+                Map.entry("(", SyntaxElement.OPEN_ROUND_BRACKET),
+                Map.entry(")", SyntaxElement.CLOSE_ROUND_BRACKET),
+                Map.entry("[", SyntaxElement.OPEN_SQUARE_BRACKET),
+                Map.entry("]", SyntaxElement.CLOSE_SQUARE_BRACKET),
+                Map.entry("{", SyntaxElement.OPEN_CURLY_BRACKET),
+                Map.entry("}", SyntaxElement.CLOSE_CURLY_BRACKET),
+                Map.entry(",", SyntaxElement.COMMA),
+                Map.entry("|", SyntaxElement.PIPE),
+                Map.entry("..", SyntaxElement.DOUBLE_DOT),
+                Map.entry(".", SyntaxElement.DOT),
+                Map.entry("&", SyntaxElement.AMPERSAND)
+        );
+        for(val p : syntaxElements.entrySet()) {
+            try(val scanner = new TokenScanner(p.getKey())) {
+                val lexer = new Lexer(scanner);
+                val expected = Optional.of(p.getValue());
+                val actual = lexer.scanSyntaxElement(p.getValue());
+                Assert.assertEquals(expected, actual);
+            }
+        }
+    }
+
 }
