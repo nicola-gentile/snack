@@ -1,7 +1,9 @@
 package org.snack;
 
+import org.snack.compiler.lexer.Lexer;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Lexer.main(args);
     }
 }

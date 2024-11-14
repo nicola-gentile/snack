@@ -31,10 +31,12 @@ public enum SyntaxElement implements Token {
     DOUBLE_DOT("\\.\\."),
     DOT("\\."),
     AMPERSAND("&"),
-    COLON(":");
+    COLON(":"),
+    EQUAL("="),
+    CARET("\\^");
     @NonNull final String regex;
 
     @Getter(lazy = true)
-    final private Pattern pattern = Pattern.compile(String.format("^(?:%s)", getRegex()));
+    final private Pattern pattern = Pattern.compile(Lexer.prepareRegex(getRegex()));
 
 }

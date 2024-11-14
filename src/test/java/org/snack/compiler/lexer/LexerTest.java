@@ -32,18 +32,6 @@ public class LexerTest {
                 Assert.assertEquals(expected, actual);
             }
         }
-//        val wrongIntegers = List.of(
-//                "123abc", "12a34",
-//                "0xsnack",
-//                "0b", "0B", "0b2", "0b3", "0b4", "0b5", "0b6", "0b7", "0b8", "0b9", "0b120",
-//                "0o", "0O", "0o8", "0o9", "0O1C4",
-//                "0x", "0X", "0xP", "0Xy"
-//        );
-//        for(val s : wrongIntegers) {
-//            val actual = new Lexer(s).scanIntegerNumber();
-//            val expected = Optional.empty();
-//            Assert.assertEquals(expected, actual);
-//        }
     }
 
     @Test
@@ -197,7 +185,8 @@ public class LexerTest {
                 Map.entry("|", SyntaxElement.PIPE),
                 Map.entry("..", SyntaxElement.DOUBLE_DOT),
                 Map.entry(".", SyntaxElement.DOT),
-                Map.entry("&", SyntaxElement.AMPERSAND)
+                Map.entry("&", SyntaxElement.AMPERSAND),
+                Map.entry("=", SyntaxElement.EQUAL)
         );
         for(val p : syntaxElements.entrySet()) {
             try(val scanner = new TokenScanner(p.getKey())) {
