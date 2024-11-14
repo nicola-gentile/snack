@@ -29,4 +29,8 @@ public class TokenScanner implements AutoCloseable, RegexScanner {
         return Optional.ofNullable(scanner.findWithinHorizon(pattern, 0));
     }
 
+    @Override
+    public boolean isEmpty() {
+        return scanner.hasNext();
+    }
 }

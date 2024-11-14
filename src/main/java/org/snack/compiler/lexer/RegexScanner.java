@@ -13,4 +13,6 @@ public interface RegexScanner {
 
     Optional<String> next(@NonNull Pattern pattern);
 
+    boolean isEmpty();
+
 }
