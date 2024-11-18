@@ -14,14 +14,6 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class Lexer {
 
-    static private String anchorToBegin(@NonNull String regex) {
-        return String.format("^(?:%s)", regex);
-    }
-
-    static private String skipSeparator(@NonNull String regex) {
-        return String.format("[ \\r\\t]*%s", regex);
-    }
-
     static private String anchorToInputBegin(@NonNull String regex) {
         return String.format("\\G(?:%s)", regex);
     }
@@ -43,7 +35,7 @@ public class Lexer {
     @NonNull @Getter
     RegexScanner scanner;
 
-    public static final String ESCAPE_CHARACTERS = "rtnbf'\\\\'";
+    public static final String ESCAPE_CHARACTERS = "rtnbf'\\\\";
     public static final String IDENTIFIER_REGEX = prepareRegex("\\$?[_a-zA-Z][_a-zA-Z0-9'?]*!?|[+\\-*/<>|~^&=]+");
     public static final String REAL_NUM_REGEX = prepareRegex("[+-]?(?:([0-9]+\\.[0-9]*)|(\\.[0-9]+))(?:[eE][+-]?[0-9]+)?|[0-9]+[Ee][+-]?[0-9]+");
     public static final String INTEGER_NUM_REGEX = prepareRegex("([+-]?(?:0[xX][0-9A-Fa-f]+|0[bB][01]+|0[oO][0-7]+|[0-9]+))");

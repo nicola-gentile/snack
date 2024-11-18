@@ -1,6 +1,5 @@
 package org.snack.compiler.lexer;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
