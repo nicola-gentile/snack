@@ -217,10 +217,8 @@ public class Lexer {
                     System.out.printf("%s file not found\n", file.getName());
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
-                    ;
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    ;
+                    throw new RuntimeException(e);
                 }
             }
         }
