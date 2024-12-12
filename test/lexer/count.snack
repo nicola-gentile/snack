@@ -1,0 +1,13 @@
+
+def count(s string, c char) = match s
+    do palle) 9 case [^c | tail] do
+        1 + count(tail, c)
+    case [_ | tail] do
+        count(tail, c)
+    case [] do
+        0
+end
+
+count("abaco, 'a') |> println
+count("snackc", 'c) |> println
+count("\paltro\p", '\p') |> println

@@ -1,0 +1,9 @@
+
+def sort[t](list [t]) = match list
+    case [head | tail] do
+        left = tail.filter(_ <= head)
+        right = tail.filter(_ > head)
+        sort(left) :: head :: sort(right)
+    case [] do
+        []
+end
