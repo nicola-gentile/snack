@@ -54,7 +54,7 @@ public class LexerTest {
     @Test
     public void scanIdentifierTest() throws Exception {
         val identifiers = List.of(
-                "var", "Compare'", "Maybe", "lines!", "$MACRO_ID",
+                "var", "Compare'", "Maybe", "lines!", "$size",
                 "derivate'", "f123?'", "conatins?", "magic_var'?!"
         );
         for(val s : identifiers) {
@@ -165,7 +165,7 @@ public class LexerTest {
     }
 
     @Test
-    public void scanSyntaxElement() throws Exception {
+    public void scanSyntaxElementTest() throws Exception {
         val syntaxElements = Map.ofEntries(
                 Map.entry("if", SyntaxElement.IF),
                 Map.entry("else", SyntaxElement.ELSE),
@@ -194,6 +194,27 @@ public class LexerTest {
                 val expected = Optional.of(p.getValue());
                 val actual = lexer.scanSyntaxElement(p.getValue());
                 Assert.assertEquals(expected, actual);
+            }
+        }
+    }
+
+    @Test
+    public void scanSelfFieldTest() throws Exception {
+        val map = Map.of(
+                "$name", "name",
+                "$calc'", "calc'",
+                "$size", "size",
+                "$empty?", "empty?"
+        );
+        for (val p : map.entrySet()) {
+            try(val scanner = new TokenScanner(p.getKey())) {
+                val lexer = new Lexer(scanner);
+                val id_expected = Optional.of(new SelfField(p.getKey()));
+                val id_actual = lexer.scanSelfField();
+                Assert.assertEquals(id_expected, id_actual);
+                val real_name_expected = p.getValue();
+                val real_name_actual = id_expected.get().getRealName();
+                Assert.assertEquals(real_name_expected, real_name_actual);
             }
         }
     }

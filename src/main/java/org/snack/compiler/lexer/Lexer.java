@@ -49,6 +49,7 @@ public class Lexer {
     public static final String INVALID_CHARACTER_REGEX = prepareRegex("'\\\\?(.)?");
     public static final String INVALID_STR_REGEX = prepareRegex("(\"[^\\n]*)");
     public static final String NEW_LINE_REGEX = prepareRegex("\n");
+    public static final String SELF_FIELD_REGEX = prepareRegex("\\$[_a-zA-Z][_a-zA-Z0-9'?]*");
 
     @Getter(lazy=true)
     final private static Pattern identifierPattern = preparePattern(IDENTIFIER_REGEX);
@@ -76,6 +77,8 @@ public class Lexer {
     final private static Pattern invalidStrPattern = preparePattern(INVALID_STR_REGEX);
     @Getter(lazy = true)
     final private static Pattern unknownEscapeCharacterPattern = preparePattern(UNKNOWN_ESCAPE_CHARACTER_REGEX);
+    @Getter(lazy = true)
+    final private static Pattern selfFieldPattern = preparePattern(SELF_FIELD_REGEX);
 
     private Optional<String> extractPattern(@NonNull Pattern pattern) {
         return getScanner().next(pattern);
@@ -142,7 +145,7 @@ public class Lexer {
     public Optional<NewLine> scanNewLine() {
         return getScanner()
                 .next(getNewLinePattern())
-                .map(s -> new NewLine());
+                .map(__ -> new NewLine());
     }
 
     private int strToSingleChar(@NonNull String src) {
@@ -176,6 +179,34 @@ public class Lexer {
             return Integer.parseInt(matcher.group(1), 16);
         }
         throw new BugReportException("Could not match unicode character");
+    }
+
+    public Optional<Char> scanChar() {
+        return getScanner().next(getSingleCharPattern()).map(s -> new Char(strToSingleChar(s)))
+                .or(() -> getScanner().next(getEscapeCharPattern()).map(s -> new Char(strToEscapeChar(s))))
+                .or(() -> getScanner().next(getUnicodeCharPattern()).map(s -> new Char(strToUnicodeChar(s))));
+    }
+
+    public Optional<Str> scanStr() {
+        return getScanner()
+                .next(getStrPattern())
+                .map(s -> {
+                    val matcher = getStrPattern().matcher(s);
+                    if(matcher.find()) {
+                        return new Str(matcher.group(1));
+                    }
+                    throw new BugReportException(String.format("could not be possible to match the string \"%s\"", s));
+                });
+    }
+
+    public Optional<SelfField> scanSelfField() {
+        return getScanner()
+                .next(getSelfFieldPattern())
+                .map(SelfField::new);
+    }
+
+    public boolean isAtEOF() {
+        return getScanner().isEmpty();
     }
 
     public static void main(String[] args) {
@@ -222,28 +253,6 @@ public class Lexer {
                 }
             }
         }
-    }
-
-    public Optional<Char> scanChar() {
-        return getScanner().next(getSingleCharPattern()).map(s -> new Char(strToSingleChar(s)))
-                .or(() -> getScanner().next(getEscapeCharPattern()).map(s -> new Char(strToEscapeChar(s))))
-                .or(() -> getScanner().next(getUnicodeCharPattern()).map(s -> new Char(strToUnicodeChar(s))));
-    }
-
-    public Optional<Str> scanStr() {
-        return getScanner()
-                .next(getStrPattern())
-                .map(s -> {
-                    val matcher = getStrPattern().matcher(s);
-                    if(matcher.find()) {
-                        return new Str(matcher.group(1));
-                    }
-                    throw new BugReportException(String.format("could not be possible to match the string \"%s\"", s));
-                });
-    }
-
-    public boolean isAtEOF() {
-        return getScanner().isEmpty();
     }
 
 }

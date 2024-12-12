@@ -9,6 +9,7 @@ public sealed interface Token permits
         Str,
         InvalidToken,
         Comment,
-        NewLine
+        NewLine,
+        SelfField
 {
 }
