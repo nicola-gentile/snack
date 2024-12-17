@@ -1,4 +1,3 @@
 package org.snack.compiler.lexer;
 
-public record NewLine() implements Token {
-}
+public record NewLine() implements Token { }

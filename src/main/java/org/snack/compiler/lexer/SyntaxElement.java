@@ -36,6 +36,7 @@ public enum SyntaxElement implements Token {
     @NonNull final String regex;
 
     @Getter(lazy = true)
-    final private Pattern pattern = Pattern.compile(Lexer.prepareRegex(getRegex()));
+    private final
+    Pattern pattern = Pattern.compile(Lexer.prepareRegex(getRegex()));
 
 }

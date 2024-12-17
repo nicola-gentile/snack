@@ -4,15 +4,24 @@ import lombok.NonNull;
 
 public record Identifier(@NonNull String id) implements Token {
 
-    public final static String VARIABLE_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
-    public final static String DATA_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
-    public final static String TRAIT_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
-    public final static String PURE_FUNCTION_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
-    public final static String SYMBOL_FUNCTION_REGEX = "[+\\-*/<>|~^&]+";
-    public final static String DIRTY_FUNCTION_REGEX = "[A-Za-z_][A-Za-z0-9'?]*!";
-    public final static String MODULE_REGEX = "[a-z]([a-z_]*[a-z])?";
-    public final static String SELF_FIELD_REGEX = "\\$[A-Za-z_][A-Za-z0-9'?!]*";
-    public final static String METADATA_FIELD_REGEX = "\\$[A-Za-z_][A-Za-z0-9'?]";
+    public static final
+    String VARIABLE_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
+    public static final
+    String DATA_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
+    public static final
+    String TRAIT_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
+    public static final
+    String PURE_FUNCTION_REGEX = "[A-Za-z_][A-Za-z0-9'?]*";
+    public static final
+    String SYMBOL_FUNCTION_REGEX = "[+\\-*/<>|~^&]+";
+    public static final
+    String DIRTY_FUNCTION_REGEX = "[A-Za-z_][A-Za-z0-9'?]*!";
+    public static final
+    String MODULE_REGEX = "[a-z]([a-z_]*[a-z])?";
+    public static final
+    String SELF_FIELD_REGEX = "\\$[A-Za-z_][A-Za-z0-9'?!]*";
+    public static final
+    String METADATA_FIELD_REGEX = "\\$[A-Za-z_][A-Za-z0-9'?]";
 
     public boolean isVariableName() {
         return id.matches(VARIABLE_REGEX);
@@ -31,7 +40,9 @@ public record Identifier(@NonNull String id) implements Token {
     }
 
     public boolean isFunctionName() {
-        return isPureFunctionName() || isDirtyFunctionName() || isSymbolFunctionName();
+        return isPureFunctionName() ||
+                isDirtyFunctionName() ||
+                isSymbolFunctionName();
     }
 
     public boolean isPureFunctionName() {

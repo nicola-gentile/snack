@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+    <module name="LineLength">
+        <property name="max" value="120"/>
+    </module>
+    <module name="TreeWalker">
+        <module name="MissingOverride"/>
+        <module name="MissingDeprecated"/>
+        <module name="AnnotationLocation"/>
+        <module name="NeedBraces"/>
+        <module name="EmptyCatchBlock"/>
+        <module name="AvoidStarImport"/>
+        <module name="UnusedImports"/>
+        <module name="EmptyBlock"/>
+        <module name="ConstantName">
+            <property name="format" value="[A-Za-z_]+"/>
+            <property name="applyToPrivate" value="true"/>
+            <property name="applyToPackage" value="false"/>
+            <property name="applyToProtected" value="false"/>
+            <property name="applyToPublic" value="false"/>
+        </module>
+        <module name="ConstantName">
+            <property name="applyToPrivate" value="false"/>
+        </module>
+        <module name="WhitespaceAround">
+            <property name="allowEmptyConstructors" value="true"/>
+        </module>
+        <module name="ReturnCount">
+            <property name="max" value="1"/>
+        </module>
+        <module name="ModifierOrder"/>
+    </module>
+</module>

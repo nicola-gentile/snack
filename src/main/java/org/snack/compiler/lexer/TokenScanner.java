@@ -10,7 +10,11 @@ import java.util.regex.Pattern;
 public class TokenScanner implements AutoCloseable, RegexScanner {
 
     @Getter(lazy = true)
-    private static final Pattern delimiterPattern = Pattern.compile("[ \\r\\t]*");
+    private static final
+    Pattern delimiterPattern = Pattern.compile("[ \\r\\t]*");
+
+    @NonNull
+    Scanner scanner;
 
     private void prepareScanner() {
         scanner.useDelimiter("[ \t\r]+");
@@ -25,9 +29,6 @@ public class TokenScanner implements AutoCloseable, RegexScanner {
         this.scanner = new Scanner(source);
         prepareScanner();
     }
-
-    @NonNull
-    Scanner scanner;
 
     @Override
     public void close() throws Exception {

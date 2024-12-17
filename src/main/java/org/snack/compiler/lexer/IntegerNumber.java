@@ -1,7 +1,6 @@
 package org.snack.compiler.lexer;
 
 import lombok.NonNull;
-import org.snack.utils.CompareUtils;
 
 import java.math.BigInteger;
 
@@ -24,10 +23,13 @@ public record IntegerNumber(BigInteger value) implements Token {
     private static final BigInteger UINT64_MIN = BigInteger.ZERO;
     private static final BigInteger UINT64_MAX = INT64_MAX.shiftLeft(1);
 
-
+    private boolean lessThanOrEqualsToBigInteger(@NonNull BigInteger a, @NonNull BigInteger b) {
+        return a.compareTo(b) <= 0;
+    }
 
     private boolean inInclusiveRange(@NonNull BigInteger v, @NonNull BigInteger low, @NonNull BigInteger high) {
-        return CompareUtils.le(low, v) && CompareUtils.le(v, high);
+        return lessThanOrEqualsToBigInteger(low, v) &&
+                lessThanOrEqualsToBigInteger(v, high);
     }
 
     public boolean fitInt8() {

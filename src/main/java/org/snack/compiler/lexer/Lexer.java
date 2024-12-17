@@ -1,9 +1,16 @@
 package org.snack.compiler.lexer;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.AllArgsConstructor;
+import lombok.val;
 import org.snack.compiler.exception.BugReportException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -14,71 +21,106 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class Lexer {
 
-    static private String anchorToInputBegin(@NonNull String regex) {
+    @NonNull
+    @Getter
+    RegexScanner scanner;
+
+    private static String anchorToInputBegin(@NonNull String regex) {
         return String.format("\\G(?:%s)", regex);
     }
 
-    static public String prepareRegex(@NonNull String regex) {
+    public static String prepareRegex(@NonNull String regex) {
         return anchorToInputBegin(regex);
     }
+    private static final int DEFAULT_PATTERN_FLAGS = Pattern.MULTILINE;
 
-    private final static int DEFAULT_PATTERN_FLAGS = Pattern.MULTILINE;
-
-    static public Pattern preparePattern(@NonNull String regex) {
+    public static Pattern preparePattern(@NonNull String regex) {
         return preparePattern(regex, 0);
     }
 
-    static public Pattern preparePattern(@NonNull String regex, int flags) {
-        return Pattern.compile(regex, DEFAULT_PATTERN_FLAGS|flags);
+    public static Pattern preparePattern(@NonNull String regex, int flags) {
+        return Pattern.compile(regex, DEFAULT_PATTERN_FLAGS | flags);
     }
 
-    @NonNull @Getter
-    RegexScanner scanner;
+    public static final
+    String ESCAPE_CHARACTERS = "rtnbf'\\\\";
+    private static final
+    String RAW_IDENTIFIER_REGEX = "\\$?[_a-zA-Z][_a-zA-Z0-9'?]*!?|[+\\-*/<>|~^&=]+";
+    public static final
+    String IDENTIFIER_REGEX = prepareRegex(RAW_IDENTIFIER_REGEX);
+    public static final
+    String REAL_NUM_REGEX = prepareRegex(String.format(
+            "[+-]?(%s|%s)",
+            "(?:([0-9]+\\.[0-9]*)|(\\.[0-9]+))(?:[eE][+-]?[0-9]+)?",
+            "[0-9]+[Ee][+-]?[0-9]+"
+    ));
+    public static final
+    String INTEGER_NUM_REGEX = prepareRegex("([+-]?(?:0[xX][0-9A-Fa-f]+|0[bB][01]+|0[oO][0-7]+|[0-9]+))");
+    public static final
+    String ONE_LINE_COMMENT_REGEX = prepareRegex("#(\\n|[^{][^\\n]*)");
+    public static final
+    String MULTI_LINE_COMMENT_REGEX = prepareRegex("#\\{(.*?)\\}#");
+    private static final
+    String SINGLE_CHAR_REGEX = prepareRegex("'([^\\\\])'");
+    private static final
+    String ESCAPE_CHAR_REGEX =  prepareRegex(String.format("'\\\\([%s])'", ESCAPE_CHARACTERS));
+    private static final
+    String UNICODE_CHAR_CODE_REGEX =  prepareRegex("'\\\\[xu](\\p{XDigit}{2}(?:\\p{XDigit}{2})?)'");
+    public static final
+    String UNKNOWN_ESCAPE_CHARACTER_REGEX = prepareRegex(String.format("'\\\\([^%s])'", ESCAPE_CHARACTERS));
+    public static final
+    String STR_REGEX = prepareRegex("\"((.*)(?<!\\\\))\"");
+    public static final
+    String INVALID_CHARACTER_REGEX = prepareRegex("'\\\\?(.)?");
+    public static final
+    String INVALID_STR_REGEX = prepareRegex("(\"[^\\n]*)");
+    public static final
+    String NEW_LINE_REGEX = prepareRegex("\n");
+    public static final
+    String SELF_FIELD_REGEX = prepareRegex("\\$[_a-zA-Z][_a-zA-Z0-9'?]*");
 
-    public static final String ESCAPE_CHARACTERS = "rtnbf'\\\\";
-    public static final String IDENTIFIER_REGEX = prepareRegex("\\$?[_a-zA-Z][_a-zA-Z0-9'?]*!?|[+\\-*/<>|~^&=]+");
-    public static final String REAL_NUM_REGEX = prepareRegex("[+-]?(?:([0-9]+\\.[0-9]*)|(\\.[0-9]+))(?:[eE][+-]?[0-9]+)?|[0-9]+[Ee][+-]?[0-9]+");
-    public static final String INTEGER_NUM_REGEX = prepareRegex("([+-]?(?:0[xX][0-9A-Fa-f]+|0[bB][01]+|0[oO][0-7]+|[0-9]+))");
-    public static final String ONE_LINE_COMMENT_REGEX = prepareRegex("#(\\n|[^{][^\\n]*)");
-    public static final String MULTI_LINE_COMMENT_REGEX = prepareRegex("#\\{(.*?)\\}#");
-    private static final String SINGLE_CHAR_REGEX = prepareRegex("'([^\\\\])'");
-    private static final String ESCAPE_CHAR_REGEX =  prepareRegex(String.format("'\\\\([%s])'", ESCAPE_CHARACTERS));
-    private static final String UNICODE_CHAR_CODE_REGEX =  prepareRegex("'\\\\[xu](\\p{XDigit}{2}(?:\\p{XDigit}{2})?)'");
-    public static final String UNKNOWN_ESCAPE_CHARACTER_REGEX = prepareRegex(String.format("'\\\\([^%s])'", ESCAPE_CHARACTERS));
-    public static final String STR_REGEX = prepareRegex("\"((.*)(?<!\\\\))\"");
-    public static final String INVALID_CHARACTER_REGEX = prepareRegex("'\\\\?(.)?");
-    public static final String INVALID_STR_REGEX = prepareRegex("(\"[^\\n]*)");
-    public static final String NEW_LINE_REGEX = prepareRegex("\n");
-    public static final String SELF_FIELD_REGEX = prepareRegex("\\$[_a-zA-Z][_a-zA-Z0-9'?]*");
-
-    @Getter(lazy=true)
-    final private static Pattern identifierPattern = preparePattern(IDENTIFIER_REGEX);
     @Getter(lazy = true)
-    final private static Pattern integerNumberPattern = preparePattern(INTEGER_NUM_REGEX);
+    private static final
+    Pattern identifierPattern = preparePattern(IDENTIFIER_REGEX);
     @Getter(lazy = true)
-    final private static Pattern realNumberPattern = preparePattern(REAL_NUM_REGEX);
+    private static final
+    Pattern integerNumberPattern = preparePattern(INTEGER_NUM_REGEX);
     @Getter(lazy = true)
-    final private static Pattern oneLineCommentPattern = preparePattern(ONE_LINE_COMMENT_REGEX, Pattern.DOTALL);
+    private static final
+    Pattern realNumberPattern = preparePattern(REAL_NUM_REGEX);
     @Getter(lazy = true)
-    final private static Pattern multiLineCommentPattern = preparePattern(MULTI_LINE_COMMENT_REGEX, Pattern.DOTALL);
+    private static final
+    Pattern oneLineCommentPattern = preparePattern(ONE_LINE_COMMENT_REGEX, Pattern.DOTALL);
     @Getter(lazy = true)
-    final private static Pattern newLinePattern = preparePattern(NEW_LINE_REGEX);
+    private static final
+    Pattern multiLineCommentPattern = preparePattern(MULTI_LINE_COMMENT_REGEX, Pattern.DOTALL);
     @Getter(lazy = true)
-    final private static Pattern singleCharPattern = preparePattern(SINGLE_CHAR_REGEX);
+    private static final
+    Pattern newLinePattern = preparePattern(NEW_LINE_REGEX);
     @Getter(lazy = true)
-    final private static Pattern escapeCharPattern = preparePattern(ESCAPE_CHAR_REGEX);
+    private static final
+    Pattern singleCharPattern = preparePattern(SINGLE_CHAR_REGEX);
     @Getter(lazy = true)
-    final private static Pattern unicodeCharPattern = preparePattern(UNICODE_CHAR_CODE_REGEX);
+    private static final
+    Pattern escapeCharPattern = preparePattern(ESCAPE_CHAR_REGEX);
     @Getter(lazy = true)
-    final private static Pattern strPattern = preparePattern(STR_REGEX);
+    private static final
+    Pattern unicodeCharPattern = preparePattern(UNICODE_CHAR_CODE_REGEX);
     @Getter(lazy = true)
-    final private static Pattern invalidCharPattern = preparePattern(INVALID_CHARACTER_REGEX);
+    private static final
+    Pattern strPattern = preparePattern(STR_REGEX);
     @Getter(lazy = true)
-    final private static Pattern invalidStrPattern = preparePattern(INVALID_STR_REGEX);
+    private static final
+    Pattern invalidCharPattern = preparePattern(INVALID_CHARACTER_REGEX);
     @Getter(lazy = true)
-    final private static Pattern unknownEscapeCharacterPattern = preparePattern(UNKNOWN_ESCAPE_CHARACTER_REGEX);
+    private static final
+    Pattern invalidStrPattern = preparePattern(INVALID_STR_REGEX);
     @Getter(lazy = true)
-    final private static Pattern selfFieldPattern = preparePattern(SELF_FIELD_REGEX);
+    private static final
+    Pattern unknownEscapeCharacterPattern = preparePattern(UNKNOWN_ESCAPE_CHARACTER_REGEX);
+    @Getter(lazy = true)
+    private static final
+    Pattern selfFieldPattern = preparePattern(SELF_FIELD_REGEX);
 
     private Optional<String> extractPattern(@NonNull Pattern pattern) {
         return getScanner().next(pattern);
@@ -113,7 +155,7 @@ public class Lexer {
 
     private String extractOneLineComment(@NonNull String src) {
         val matcher = getOneLineCommentPattern().matcher(src);
-        if(matcher.find()) {
+        if (matcher.find()) {
             return matcher.group(1);
         }
         else {
@@ -123,7 +165,7 @@ public class Lexer {
 
     private String extractMultilineComment(@NonNull String src) {
         val matcher = getMultiLineCommentPattern().matcher(src);
-        if(matcher.find()) {
+        if (matcher.find()) {
             return matcher.group(1);
         }
         else {
@@ -132,14 +174,26 @@ public class Lexer {
     }
 
     public Optional<Comment> scanComment() {
-        return getScanner().next(getOneLineCommentPattern()).map(s -> new Comment(extractOneLineComment(s)))
-                .or(() -> getScanner().next(getMultiLineCommentPattern()).map(s -> new Comment(extractMultilineComment(s))));
+        return getScanner()
+                .next(getOneLineCommentPattern())
+                .map(s -> new Comment(extractOneLineComment(s)))
+                .or(() -> getScanner()
+                        .next(getMultiLineCommentPattern())
+                        .map(s -> new Comment(extractMultilineComment(s)))
+                );
     }
 
     public Optional<InvalidToken> scanInvalidToken() {
-        return getScanner().next(getUnknownEscapeCharacterPattern()).map(s -> new InvalidToken(s, LexerErrorCode.UNKNOWN_ESCAPE_CHARACTER))
-                .or(() -> getScanner().next(getInvalidStrPattern()).map(s -> new InvalidToken(s, LexerErrorCode.INVALID_STRING_TOKEN)))
-                .or(() -> getScanner().next(getInvalidCharPattern()).map(s -> new InvalidToken(s, LexerErrorCode.INVALID_CHARACTER_TOKEN)));
+        return getScanner()
+                .next(getUnknownEscapeCharacterPattern())
+                .map(s -> new InvalidToken(s, LexerErrorCode.UNKNOWN_ESCAPE_CHARACTER))
+                .or(() -> getScanner()
+                        .next(getInvalidStrPattern())
+                        .map(s -> new InvalidToken(s, LexerErrorCode.INVALID_STRING_TOKEN)))
+                .or(() -> getScanner()
+                        .next(getInvalidCharPattern())
+                        .map(s -> new InvalidToken(s, LexerErrorCode.INVALID_CHARACTER_TOKEN))
+                );
     }
 
     public Optional<NewLine> scanNewLine() {
@@ -150,7 +204,7 @@ public class Lexer {
 
     private int strToSingleChar(@NonNull String src) {
         val matcher = getSingleCharPattern().matcher(src);
-        if(matcher.find()) {
+        if (matcher.find()) {
             return matcher.group(1).charAt(0);
         }
         throw new BugReportException(String.format("Error in parsing \"%s\" as character", src));
@@ -158,7 +212,7 @@ public class Lexer {
 
     private int strToEscapeChar(String src) {
         val matcher = getEscapeCharPattern().matcher(src);
-        if(matcher.find()) {
+        if (matcher.find()) {
             return switch (matcher.group(1).charAt(0)) {
                 case 'n' -> '\n';
                 case 't' -> '\t';
@@ -175,7 +229,7 @@ public class Lexer {
 
     private int strToUnicodeChar(String src) {
         val matcher = getUnicodeCharPattern().matcher(src);
-        if(matcher.find()) {
+        if (matcher.find()) {
             return Integer.parseInt(matcher.group(1), 16);
         }
         throw new BugReportException("Could not match unicode character");
@@ -192,7 +246,7 @@ public class Lexer {
                 .next(getStrPattern())
                 .map(s -> {
                     val matcher = getStrPattern().matcher(s);
-                    if(matcher.find()) {
+                    if (matcher.find()) {
                         return new Str(matcher.group(1));
                     }
                     throw new BugReportException(String.format("could not be possible to match the string \"%s\"", s));
@@ -210,8 +264,8 @@ public class Lexer {
     }
 
     public static void main(String[] args) {
-        if(args.length == 0) {
-            System.out.println("No file to be lexed has been provided");
+        if (args.length == 0) {
+            System.out.println("No file to be parsed has been provided");
         }
         else {
             for (val s : args) {
