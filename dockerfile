@@ -7,6 +7,3 @@ RUN wget https://github.com/nicola-gentile/snack/archive/refs/heads/asd.zip && \
 EXPOSE 8080:8080
 
 ENTRYPOINT java -jar /app/snack-asd/target/snack-1.0-SNAPSHOT.jar
-
-
-
