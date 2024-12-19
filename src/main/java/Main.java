@@ -1,5 +1,9 @@
 import com.google.gson.JsonParseException;
-import lombok.*;
+import io.vavr.control.Try;
+import lombok.val;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NonNull;
 import org.snack.compiler.exception.BugReportException;
 import org.snack.compiler.lexer.Lexer;
 import org.snack.compiler.lexer.SyntaxElement;
@@ -16,6 +20,7 @@ import spark.Spark;
 import com.google.gson.Gson;
 
 public class Main {
+
 
     private static List<Token> lexerService(@NonNull String sourceCode) throws Exception {
         List<Token> tokens = new ArrayList<>();
@@ -71,23 +76,22 @@ public class Main {
 
             val gson = new Gson();
 
-            try {
+            return Try.of(() -> {
                 String sourceCode = gson.fromJson(req.body(), LexerRequest.class).getSourceCode();
                 res.status(200);
                 val responseBody = new TokenListResponse(lexerService(sourceCode));
                 return gson.toJson(responseBody, TokenListResponse.class);
-            } catch (JsonParseException jpe) {
+            }).recover(JsonParseException.class, exc -> {
                 res.status(403);
-                val errorResponse = new ErrorResponse(jpe.getMessage());
-                return gson.toJson(errorResponse, ErrorResponse.class);
-            } catch (Exception exc) {
+                val errorResponse = new ErrorResponse(exc.getMessage());
+                return gson.toJson(errorResponse);
+            }).recover(Exception.class, exc -> {
                 res.status(400);
                 val errorResponse = new ErrorResponse(exc.getMessage());
-                return gson.toJson(errorResponse, ErrorResponse.class);
-            }
+                return gson.toJson(errorResponse);
+            }).get();
         });
 
-
-    }
+        }
 
 }
