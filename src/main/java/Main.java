@@ -70,6 +70,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+        System.out.println("Initializing lexer server");
         Spark.port(8080);
         Spark.post("lexer", (req, res) -> {
             res.type("text/json");
