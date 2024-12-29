@@ -18,8 +18,8 @@ jobs:
 
       - name: Setup env
         run: |
-          - TAG=$(date +%Y%m%d%H%M%S) # Example command to get a timestamp
-          - echo "TAG=$TAG" >> $GITHUB_ENV
+          TAG=$(date +%Y%m%d%H%M%S)
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.TAG }} .
