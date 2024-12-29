@@ -7,4 +7,4 @@ RUN mvn clean install
 
 EXPOSE 8080
 
-ENTRYPOINT java -jar target/snack-1.0-SNAPSHOT.jar
+ENTRYPOINT ["mvn", "exec:java"]
