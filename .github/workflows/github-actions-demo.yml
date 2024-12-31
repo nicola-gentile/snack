@@ -55,4 +55,5 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           asset_name: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          asset_content_type: application/zip
 
