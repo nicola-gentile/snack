@@ -34,7 +34,7 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker push ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker push ${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -48,10 +48,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./path/to/your/asset.zip # Replace with your asset's path
-          asset_name: your-asset-name.zip # Replace with the desired asset name
-          asset_content_type: application/zip
+
