@@ -43,12 +43,9 @@ jobs:
           tag_name: v${{ env.TAG }}
           release_name: "Release ${{env.IMAGE_NAME}}:${{ env.TAG }}"
           body: |
-            Docker image is available in the GitHub Container Registry:
+            Docker image is available in the GitHub Container Registry.
 
-            - **Image:** `ghcr.io/${{ github.repository }}/my-image`
-            - **Tag:** `${{ github.ref_name }}`
-
-            To pull this image:
+            To pull the image:
             ```bash
             docker pull ghcr.io/${{ github.repository }}/${{env.IMAGE_NAME}}:${{ env.TAG }}
             ```
