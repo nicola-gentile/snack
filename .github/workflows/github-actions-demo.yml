@@ -28,8 +28,10 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: v${{ env.TAG }}
-          release_name: "Release v${{ env.TAG }}"
+          release_name: "${{env.IMAGE_NAME}}_v${{ env.TAG }}"
           body: |
             - Docker image: `${{ env.IMAGE_NAME }}:${{ env.TAG }}`
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
